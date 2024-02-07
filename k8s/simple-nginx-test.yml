@@ -1,0 +1,53 @@
+# Simple nginx test
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-example-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-example-1
+  template:
+    metadata:
+      labels:
+        app: nginx-example-1
+    spec:
+      containers:
+      - name: nginx-example-1
+        image: nginx
+        ports:
+          - name: http
+            containerPort: 80
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name:  nginx-example-1-svc
+spec:
+  selector:
+    app:  nginx-example-1
+  type:  LoadBalancer
+  ports:
+  - name:  name-of-the-port
+    port:  80
+    targetPort:  http
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name:  nginx-example-1-svc-private
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  selector:
+    app:  nginx-example-1
+  type:  LoadBalancer
+  ports:
+  - name:  name-of-the-port
+    port:  80
+    targetPort:  http

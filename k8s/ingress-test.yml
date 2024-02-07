@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress-example-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-ingress-example-1
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress-example-1
+    spec:
+      containers:
+      - name: nginx-ingress-example-1
+        image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+        ports:
+          - name: http
+            containerPort: 80
+        env:
+        - name: TITLE
+          value: "Welcome to Azure Kubernetes Service (AKS)"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name:  nginx-ingress-example-1-svc
+spec:
+  selector:
+    app:  nginx-ingress-example-1
+  type:  ClusterIP
+  ports:
+  - name:  name-of-the-port
+    port:  80
+    targetPort:  80
+    protocol: TCP
+
+---
+
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name:  nginx-ingress-example-1
+spec:
+  ingressClassName: ingress-nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-ingress-example-1-svc
+                port:
+                  number: 80
